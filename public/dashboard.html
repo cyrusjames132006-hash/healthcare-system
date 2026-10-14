@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediCore Hospital Management System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background-color: #f4f7f6; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        
+        /* Sidebar styling para sa Desktop */
+        .sidebar { 
+            width: 250px; 
+            background-color: #00a88f; 
+            min-height: 100vh; 
+            color: white; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            z-index: 100; 
+            transition: all 0.3s;
+        }
+        
+        .sidebar .nav-link { color: rgba(255, 255, 255, 0.85); font-weight: 500; padding: 12px 20px; margin: 4px 15px; border-radius: 8px; cursor: pointer; }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active { background-color: rgba(255, 255, 255, 0.2); color: white; }
+        
+        /* Main content offset para sa Desktop */
+        .main-content { margin-left: 250px; padding: 25px; }
+        .admin-only { display: none; }
+
+        /* Responsive adjustments para sa Mobile at Tablets (Portrait & Landscape) */
+        @media (max-width: 991.98px) {
+            .sidebar { 
+                position: relative; 
+                width: 100%; 
+                min-height: auto; 
+            }
+            .main-content { 
+                margin-left: 0; 
+                padding: 15px; 
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Mobile Header Toggle Bar -->
+    <nav class="navbar navbar-dark bg-success d-lg-none px-3">
+        <a class="navbar-brand fw-bold" href="#"><i class="fa-solid fa-hospital me-2"></i> MediCore</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileSidebar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </nav>
+
+    <!-- Offcanvas Sidebar para sa Mobile (Portrait / Landscape) -->
+    <div class="offcanvas offcanvas-start bg-success text-white" tabindex="-1" id="mobileSidebar">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title fw-bold"><i class="fa-solid fa-hospital me-2"></i> MediCore</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+        </div>
+        <div class="offcanvas-body d-flex flex-column p-3">
+            <ul class="nav nav-pills flex-column mb-auto">
+                <li class="nav-item"><a href="#" class="nav-link active" data-bs-dismiss="offcanvas"><i class="fa-solid fa-chart-line me-2"></i> Dashboard</a></li>
+                <li><a href="#appointmentSection" class="nav-link" data-bs-dismiss="offcanvas"><i class="fa-solid fa-calendar-check me-2"></i> Appointments</a></li>
+                <li class="admin-only"><a href="#slotSection" class="nav-link" data-bs-dismiss="offcanvas"><i class="fa-solid fa-calendar-days me-2"></i> Manage Slots</a></li>
+                <li><a href="#medicalRecordSection" class="nav-link" data-bs-dismiss="offcanvas"><i class="fa-solid fa-file-medical me-2"></i> Medical Records</a></li>
+                <li><a href="#prescriptionSection" class="nav-link" data-bs-dismiss="offcanvas"><i class="fa-solid fa-prescription me-2"></i> Prescriptions</a></li>
+                <li><a href="#serviceSection" class="nav-link" data-bs-dismiss="offcanvas"><i class="fa-solid fa-stethoscope me-2"></i> Health Services</a></li>
+                <li class="admin-only"><a href="#medicineSection" class="nav-link" data-bs-dismiss="offcanvas"><i class="fa-solid fa-pills me-2"></i> Pharmacy Inventory</a></li>
+            </ul>
+            <button class="btn btn-outline-light w-100 mt-auto" onclick="logout()"><i class="fa-solid fa-right-from-bracket me-2"></i> Logout</button>
+        </div>
+    </div>
+
+    <!-- Permanent Sidebar para sa Desktop -->
+    <div class="sidebar d-none d-lg-flex flex-column p-3">
+        <a href="#" class="d-flex align-middle text-white text-decoration-none mb-4 mt-2 px-2">
+            <i class="fa-solid fa-hospital fa-2x me-2"></i>
+            <div>
+                <h5 class="fw-bold mb-0">MediCore</h5>
+                <small style="font-size: 11px; opacity: 0.8;">HOSPITAL SYSTEM</small>
+            </div>
+        </a>
+        <hr class="text-white-50">
+        <ul class="nav nav-pills flex-column mb-auto">
+            <li class="nav-item"><a href="#" class="nav-link active"><i class="fa-solid fa-chart-line me-2"></i> Dashboard</a></li>
+            <li><a href="#appointmentSection" class="nav-link"><i class="fa-solid fa-calendar-check me-2"></i> Appointments</a></li>
+            <li class="admin-only"><a href="#slotSection" class="nav-link"><i class="fa-solid fa-calendar-days me-2"></i> Manage Slots</a></li>
+            <li><a href="#medicalRecordSection" class="nav-link"><i class="fa-solid fa-file-medical me-2"></i> Medical Records</a></li>
+            <li><a href="#prescriptionSection" class="nav-link"><i class="fa-solid fa-prescription me-2"></i> Prescriptions</a></li>
+            <li><a href="#serviceSection" class="nav-link"><i class="fa-solid fa-stethoscope me-2"></i> Health Services</a></li>
+            <li class="admin-only"><a href="#medicineSection" class="nav-link"><i class="fa-solid fa-pills me-2"></i> Pharmacy Inventory</a></li>
+        </ul>
+        <button class="btn btn-outline-light w-100 mt-auto" onclick="logout()"><i class="fa-solid fa-right-from-bracket me-2"></i> Logout</button>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="main-content">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+            <div>
+                <h2 class="fw-bold text-dark mb-0 fs-4 fs-md-2">Healthcare Management System</h2>
+                <small class="text-muted">Logged in as: <b id="userDisplay" class="text-primary">Loading...</b> (<span id="roleDisplay" class="text-uppercase fw-bold text-success">User</span>)</small>
+            </div>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#bookModal">
+                <i class="fa-solid fa-plus me-1"></i> Book Appointment
+            </button>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <!-- Appointments Table -->
+                <div class="card border-0 shadow-sm rounded-4 mb-4" id="appointmentSection">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-3"><i class="fa-solid fa-calendar-check text-primary me-2"></i> Patient Appointments</h5>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light"><tr><th>NAME</th><th>DOCTOR</th><th>DATE</th><th class="admin-only">ACTION</th></tr></thead>
+                                <tbody id="appointmentTableBody"><tr><td colspan="4" class="text-center text-muted">Loading...</td></tr></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Manage Appointment Slots (Admin Only) -->
+                <div class="card border-0 shadow-sm rounded-4 mb-4 admin-only" id="slotSection">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="fw-bold mb-0"><i class="fa-solid fa-calendar-days text-primary me-2"></i> Available Schedule & Slots</h5>
+                            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#slotModal">+ Add Schedule</button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light"><tr><th>AVAILABLE DATE</th><th>MAX SLOTS</th><th>ACTION</th></tr></thead>
+                                <tbody id="slotTableBody"><tr><td colspan="3" class="text-center text-muted">Loading...</td></tr></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Medical Records Table -->
+                <div class="card border-0 shadow-sm rounded-4 mb-4" id="medicalRecordSection">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="fw-bold mb-0"><i class="fa-solid fa-file-medical text-info me-2"></i> Medical Records</h5>
+                            <button class="btn btn-sm btn-outline-info admin-only" data-bs-toggle="modal" data-bs-target="#recordModal">+ Add Record</button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light"><tr><th>PATIENT</th><th>DIAGNOSIS</th><th>TREATMENT</th><th>DATE</th><th class="admin-only">ACTION</th></tr></thead>
+                                <tbody id="recordTableBody"><tr><td colspan="5" class="text-center text-muted">Loading...</td></tr></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Prescriptions Table -->
+                <div class="card border-0 shadow-sm rounded-4 mb-4" id="prescriptionSection">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="fw-bold mb-0"><i class="fa-solid fa-prescription text-warning me-2"></i> Prescriptions</h5>
+                            <button class="btn btn-sm btn-outline-warning admin-only" data-bs-toggle="modal" data-bs-target="#prescriptionModal">+ Add Prescription</button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light"><tr><th>PATIENT</th><th>MEDICINE</th><th>DOSAGE</th><th>INSTRUCTIONS</th><th class="admin-only">ACTION</th></tr></thead>
+                                <tbody id="prescriptionTableBody"><tr><td colspan="5" class="text-center text-muted">Loading...</td></tr></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Health Services Table -->
+                <div class="card border-0 shadow-sm rounded-4 mb-4" id="serviceSection">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="fw-bold mb-0"><i class="fa-solid fa-stethoscope text-success me-2"></i> Health Services</h5>
+                            <button class="btn btn-sm btn-outline-success admin-only" data-bs-toggle="modal" data-bs-target="#serviceModal">+ Add Service</button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light"><tr><th>SERVICE NAME</th><th>DESCRIPTION</th><th>FEE</th><th class="admin-only">ACTION</th></tr></thead>
+                                <tbody id="serviceTableBody"><tr><td colspan="4" class="text-center text-muted">Loading...</td></tr></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pharmacy Inventory (Admin Only) -->
+                <div class="card border-0 shadow-sm rounded-4 mb-4 admin-only" id="medicineSection">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="fw-bold mb-0"><i class="fa-solid fa-pills text-success me-2"></i> Pharmacy Inventory</h5>
+                            <button class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#medicineModal">+ Add Medicine</button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light"><tr><th>MEDICINE</th><th>CATEGORY</th><th>STOCK</th><th>ACTION</th></tr></thead>
+                                <tbody id="medicineTableBody"><tr><td colspan="4" class="text-center text-muted">Loading...</td></tr></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-body p-4">
+                        <h6 class="fw-bold mb-3"><i class="fa-solid fa-user-doctor text-info me-2"></i> Available Doctors</h6>
+                        <div class="p-2 rounded bg-light mb-2"><h6 class="mb-0 fw-bold">Dr. Santos</h6><small class="text-muted">General Physician</small></div>
+                        <div class="p-2 rounded bg-light"><h6 class="mb-0 fw-bold">Dr. Reyes</h6><small class="text-muted">Cardiologist</small></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals (Centered and Responsive) -->
+    <div class="modal fade" id="bookModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content rounded-4 border-0">
+        <div class="modal-header bg-primary text-white"><h5 class="modal-title">Book Appointment</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
+        <div class="modal-body"><form id="appointmentForm">
+            <div class="mb-3"><label class="form-label fw-bold">Patient Name</label><input type="text" id="patientName" class="form-control" required></div>
+            <div class="mb-3"><label class="form-label fw-bold">Doctor</label><select id="doctorSelect" class="form-select" required><option value="">Select doctor...</option><option value="Dr. Santos">Dr. Santos</option><option value="Dr. Reyes">Dr. Reyes</option></select></div>
+            <div class="mb-3"><label class="form-label fw-bold">Available Date & Slots</label><select id="appointmentDate" class="form-select" required><option value="">Select available date...</option></select></div>
+            <button type="submit" class="btn btn-primary w-100">Submit</button>
+        </form></div>
+    </div></div></div>
+
+    <div class="modal fade" id="slotModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content rounded-4 border-0">
+        <div class="modal-header bg-primary text-white"><h5 class="modal-title">Add Available Schedule Slot</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
+        <div class="modal-body"><form id="slotForm">
+            <div class="mb-3"><label class="form-label fw-bold">Date</label><input type="date" id="slotDate" class="form-control" required></div>
+            <div class="mb-3"><label class="form-label fw-bold">Max Slots Limit</label><input type="number" id="slotMax" class="form-control" min="1" required></div>
+            <button type="submit" class="btn btn-primary w-100">Save Schedule</button>
+        </form></div>
+    </div></div></div>
+
+    <div class="modal fade" id="recordModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content rounded-4 border-0">
+        <div class="modal-header bg-info text-white"><h5 class="modal-title">Add Medical Record</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
+        <div class="modal-body"><form id="recordForm">
+            <div class="mb-3"><label class="form-label fw-bold">Select User Account</label><select id="recUsername" class="form-select" required><option value="">Select account...</option></select></div>
+            <div class="mb-3"><label class="form-label fw-bold">Patient Name</label><input type="text" id="recPatient" class="form-control" required></div>
+            <div class="mb-3"><label class="form-label fw-bold">Diagnosis</label><input type="text" id="recDiagnosis" class="form-control" required></div>
+            <div class="mb-3"><label class="form-label fw-bold">Treatment</label><input type="text" id="recTreatment" class="form-control" required></div>
+            <div class="mb-3"><label class="form-label fw-bold">Date</label><input type="date" id="recDate" class="form-control" required></div>
+            <button type="submit" class="btn btn-info w-100 text-white">Save Record</button>
+        </form></div>
+    </div></div></div>
+
+    <div class="modal fade" id="prescriptionModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content rounded-4 border-0">
+        <div class="modal-header bg-warning text-dark"><h5 class="modal-title">Add Prescription</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+        <div class="modal-body"><form id="prescriptionForm">
+            <div class="mb-3"><label class="form-label fw-bold">Select User Account</label><select id="presUsername" class="form-select" required><option value="">Select account...</option></select></div>
+            <div class="mb-3"><label class="form-label fw-bold">Patient Name</label><input type="text" id="presPatient" class="form-control" required></div>
+            <div class="mb-3"><label class="form-label fw-bold">Medicine Name</label><input type="text" id="presMed" class="form-control" required></div>
+            <div class="mb-3"><label class="form-label fw-bold">Dosage</label><input type="text" id="presDosage" class="form-control" required></div>
+            <div class="mb-3"><label class="form-label fw-bold">Instructions</label><input type="text" id="presInst" class="form-control" required></div>
+            <button type="submit" class="btn btn-warning w-100 fw-bold">Save Prescription</button>
+        </form></div>
+    </div></div></div>
+
+    <div class="modal fade" id="serviceModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content rounded-4 border-0">
+        <div class="modal-header bg-success text-white"><h5 class="modal-title">Add Health Service</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
+        <div class="modal-body"><form id="serviceForm">
+            <div class="mb-3"><label class="form-label fw-bold">Service Name</label><input type="text" id="servName" class="form-control" required></div>
+            <div class="mb-3"><label class="form-label fw-bold">Description</label><input type="text" id="servDesc" class="form-control" required></div>
+            <div class="mb-3"><label class="form-label fw-bold">Fee</label><input type="text" id="servFee" class="form-control" required></div>
+            <button type="submit" class="btn btn-success w-100">Save Service</button>
+        </form></div>
+    </div></div></div>
+
+    <div class="modal fade" id="medicineModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content rounded-4 border-0">
+        <div class="modal-header bg-success text-white"><h5 class="modal-title">Add Medicine</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
+        <div class="modal-body"><form id="medicineForm">
+            <div class="mb-3"><label class="form-label fw-bold">Medicine Name</label><input type="text" id="medName" class="form-control" required></div>
+            <div class="mb-3"><label class="form-label fw-bold">Category</label><input type="text" id="category" class="form-control" required></div>
+            <div class="mb-3"><label class="form-label fw-bold">Stock</label><input type="number" id="stock" class="form-control" required></div>
+            <button type="submit" class="btn btn-success w-100">Save Medicine</button>
+        </form></div>
+    </div></div></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let currentUser = null;
+
+        async function checkUserSession() {
+            const res = await fetch('/api/current-user');
+            const data = await res.json();
+            if (!data.loggedIn) { window.location.href = '/login.html'; return; }
+            currentUser = data.user;
+            document.getElementById('userDisplay').textContent = currentUser.username;
+            document.getElementById('roleDisplay').textContent = currentUser.role;
+
+            if (currentUser.role === 'admin') {
+                document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
+                loadMedicines();
+                loadUsersDropdown();
+                loadSlotsAdmin();
+            }
+
+            loadAppointments();
+            loadMedicalRecords();
+            loadPrescriptions();
+            loadHealthServices();
+            loadAppointmentSlotsDropdown();
+        }
+
+        async function logout() {
+            await fetch('/api/logout', { method: 'POST' });
+            window.location.href = '/login.html';
+        }
+
+        async function loadUsersDropdown() {
+            try {
+                const res = await fetch('/api/users');
+                const data = await res.json();
+                const recordSelect = document.getElementById('recUsername');
+                const presSelect = document.getElementById('presUsername');
+                recordSelect.innerHTML = '<option value="">Select account...</option>';
+                presSelect.innerHTML = '<option value="">Select account...</option>';
+                data.users.forEach(u => {
+                    recordSelect.innerHTML += `<option value="${u.username}">${u.username}</option>`;
+                    presSelect.innerHTML += `<option value="${u.username}">${u.username}</option>`;
+                });
+            } catch (e) { console.error('Error loading users:', e); }
+        }
+
+        async function loadAppointmentSlotsDropdown() {
+            try {
+                const res = await fetch('/api/slots');
+                const data = await res.json();
+                const slotSelect = document.getElementById('appointmentDate');
+                slotSelect.innerHTML = '<option value="">Select available date...</option>';
+                data.slots.forEach(s => {
+                    slotSelect.innerHTML += `<option value="${s.availableDate}">${s.availableDate} (Limit: ${s.maxSlots} slots)</option>`;
+                });
+            } catch (e) { console.error('Error loading slots:', e); }
+        }
+
+        async function loadSlotsAdmin() {
+            try {
+                const res = await fetch('/api/slots');
+                const data = await res.json();
+                const tb = document.getElementById('slotTableBody');
+                tb.innerHTML = data.slots.length === 0 ? `<tr><td colspan="3" class="text-center text-muted">No schedules available</td></tr>` : '';
+                data.slots.forEach(s => {
+                    tb.innerHTML += `<tr><td class="fw-bold">${s.availableDate}</td><td>${s.maxSlots} slots</td><td><button class="btn btn-outline-danger btn-sm border-0" onclick="deleteItem('/api/slots/${s.id}', () => { loadSlotsAdmin(); loadAppointmentSlotsDropdown(); })"><i class="fa-solid fa-trash"></i></button></td></tr>`;
+                });
+            } catch (e) { console.error('Error loading slots admin:', e); }
+        }
+
+        document.getElementById('slotForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const res = await fetch('/api/slots', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ availableDate: document.getElementById('slotDate').value, maxSlots: document.getElementById('slotMax').value })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                bootstrap.Modal.getInstance(document.getElementById('slotModal')).hide();
+                e.target.reset();
+                loadSlotsAdmin();
+                loadAppointmentSlotsDropdown();
+            } else {
+                alert(data.error);
+            }
+        });
+
+        async function loadAppointments() {
+            const res = await fetch('/api/appointments');
+            const data = await res.json();
+            const tb = document.getElementById('appointmentTableBody');
+            tb.innerHTML = data.appointments.length === 0 ? `<tr><td colspan="4" class="text-center text-muted">No appointments</td></tr>` : '';
+            data.appointments.forEach(a => {
+                const nameDisplay = currentUser.role === 'admin' ? `${a.patientName} <span class="text-muted small">(${a.username})</span>` : a.patientName;
+                const del = currentUser.role === 'admin' ? `<button class="btn btn-outline-danger btn-sm border-0" onclick="deleteItem('/api/appointments/${a.id}', loadAppointments)"><i class="fa-solid fa-trash"></i></button>` : '';
+                tb.innerHTML += `<tr><td class="fw-bold">${nameDisplay}</td><td>${a.doctorSelect}</td><td>${a.appointmentDate}</td><td class="${currentUser.role === 'admin' ? '' : 'd-none'}">${del}</td></tr>`;
+            });
+        }
+
+        document.getElementById('appointmentForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const res = await fetch('/api/appointments', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ patientName: document.getElementById('patientName').value, doctorSelect: document.getElementById('doctorSelect').value, appointmentDate: document.getElementById('appointmentDate').value })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                bootstrap.Modal.getInstance(document.getElementById('bookModal')).hide();
+                e.target.reset();
+                loadAppointments();
+            } else {
+                alert(data.error);
+            }
+        });
+
+        async function loadMedicalRecords() {
+            const res = await fetch('/api/medical-records');
+            const data = await res.json();
+            const tb = document.getElementById('recordTableBody');
+            tb.innerHTML = data.medicalRecords.length === 0 ? `<tr><td colspan="5" class="text-center text-muted">No records</td></tr>` : '';
+            data.medicalRecords.forEach(r => {
+                const nameDisplay = currentUser.role === 'admin' ? `${r.patientName} <span class="text-muted small">(${r.username})</span>` : r.patientName;
+                const del = currentUser.role === 'admin' ? `<button class="btn btn-outline-danger btn-sm border-0" onclick="deleteItem('/api/medical-records/${r.id}', loadMedicalRecords)"><i class="fa-solid fa-trash"></i></button>` : '';
+                tb.innerHTML += `<tr><td class="fw-bold">${nameDisplay}</td><td>${r.diagnosis}</td><td>${r.treatment}</td><td>${r.recordDate}</td><td class="${currentUser.role === 'admin' ? '' : 'd-none'}">${del}</td></tr>`;
+            });
+        }
+
+        document.getElementById('recordForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await fetch('/api/medical-records', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    username: document.getElementById('recUsername').value,
+                    patientName: document.getElementById('recPatient').value, 
+                    diagnosis: document.getElementById('recDiagnosis').value, 
+                    treatment: document.getElementById('recTreatment').value, 
+                    recordDate: document.getElementById('recDate').value 
+                })
+            });
+            bootstrap.Modal.getInstance(document.getElementById('recordModal')).hide();
+            e.target.reset();
+            loadMedicalRecords();
+        });
+
+        async function loadPrescriptions() {
+            const res = await fetch('/api/prescriptions');
+            const data = await res.json();
+            const tb = document.getElementById('prescriptionTableBody');
+            tb.innerHTML = data.prescriptions.length === 0 ? `<tr><td colspan="5" class="text-center text-muted">No prescriptions</td></tr>` : '';
+            data.prescriptions.forEach(p => {
+                const nameDisplay = currentUser.role === 'admin' ? `${p.patientName} <span class="text-muted small">(${p.username})</span>` : p.patientName;
+                const del = currentUser.role === 'admin' ? `<button class="btn btn-outline-danger btn-sm border-0" onclick="deleteItem('/api/prescriptions/${p.id}', loadPrescriptions)"><i class="fa-solid fa-trash"></i></button>` : '';
+                tb.innerHTML += `<tr><td class="fw-bold">${nameDisplay}</td><td>${p.medName}</td><td>${p.dosage}</td><td>${p.instructions}</td><td class="${currentUser.role === 'admin' ? '' : 'd-none'}">${del}</td></tr>`;
+            });
+        }
+
+        document.getElementById('prescriptionForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await fetch('/api/prescriptions', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    username: document.getElementById('presUsername').value,
+                    patientName: document.getElementById('presPatient').value, 
+                    medName: document.getElementById('presMed').value, 
+                    dosage: document.getElementById('presDosage').value, 
+                    instructions: document.getElementById('presInst').value 
+                })
+            });
+            bootstrap.Modal.getInstance(document.getElementById('prescriptionModal')).hide();
+            e.target.reset();
+            loadPrescriptions();
+        });
+
+        async function loadHealthServices() {
+            const res = await fetch('/api/health-services');
+            const data = await res.json();
+            const tb = document.getElementById('serviceTableBody');
+            tb.innerHTML = data.healthServices.length === 0 ? `<tr><td colspan="4" class="text-center text-muted">No services</td></tr>` : '';
+            data.healthServices.forEach(s => {
+                const del = currentUser.role === 'admin' ? `<button class="btn btn-outline-danger btn-sm border-0" onclick="deleteItem('/api/health-services/${s.id}', loadHealthServices)"><i class="fa-solid fa-trash"></i></button>` : '';
+                tb.innerHTML += `<tr><td class="fw-bold">${s.serviceName}</td><td>${s.description}</td><td>${s.fee}</td><td class="${currentUser.role === 'admin' ? '' : 'd-none'}">${del}</td></tr>`;
+            });
+        }
+
+        document.getElementById('serviceForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await fetch('/api/health-services', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ serviceName: document.getElementById('servName').value, description: document.getElementById('servDesc').value, fee: document.getElementById('servFee').value })
+            });
+            bootstrap.Modal.getInstance(document.getElementById('serviceModal')).hide();
+            e.target.reset();
+            loadHealthServices();
+        });
+
+        async function loadMedicines() {
+            const res = await fetch('/api/medicines');
+            const data = await res.json();
+            const tb = document.getElementById('medicineTableBody');
+            tb.innerHTML = data.medicines.length === 0 ? `<tr><td colspan="4" class="text-center text-muted">No medicines</td></tr>` : '';
+            data.medicines.forEach(m => {
+                tb.innerHTML += `<tr><td class="fw-bold">${m.medName}</td><td>${m.category}</td><td>${m.stock} pcs</td><td><button class="btn btn-outline-danger btn-sm border-0" onclick="deleteItem('/api/medicines/${m.id}', loadMedicines)"><i class="fa-solid fa-trash"></i></button></td></tr>`;
+            });
+        }
+
+        document.getElementById('medicineForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await fetch('/api/medicines', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ medName: document.getElementById('medName').value, category: document.getElementById('category').value, stock: document.getElementById('stock').value })
+            });
+            bootstrap.Modal.getInstance(document.getElementById('medicineModal')).hide();
+            e.target.reset();
+            loadMedicines();
+        });
+
+        async function deleteItem(url, reloadCallback) {
+            if (confirm('Are you sure you want to delete this item?')) {
+                const res = await fetch(url, { method: 'DELETE' });
+                if (res.ok) reloadCallback();
+            }
+        }
+
+        checkUserSession();
+    </script>
+
+    
+</body>
+</html>
